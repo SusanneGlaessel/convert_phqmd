@@ -35,7 +35,7 @@ impactparamter etc.
 
 ### Comments:
 
-_* Stabilisation: 791to891.exe converts fort.791 (fort.781) into fort.891 (fort.881) which
+\* Stabilisation: 791to891.exe converts fort.791 (fort.781) into fort.891 (fort.881) which
 considers a clusters as stable when the cluster-baryons are freezed out (and if it has a 
 negative binding energy).
 
