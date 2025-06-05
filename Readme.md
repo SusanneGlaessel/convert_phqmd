@@ -1,6 +1,6 @@
-RUNNING & CONVERTING PHQMD
+# RUNNING & CONVERTING PHQMD
 
-3 steps are required:
+### 3 steps are required:
 
 1) run the PHQMD code
 2) stabilize the cluster output
@@ -10,16 +10,16 @@ optional:
 5) merge output files - 100 or 10 outputfiles (for detector simulations) into 1 file
 All 4 steps are performed with the batch-script. Single steps can be switched on or off. 
 
-The following files are needed (besides the PHQMD code):
+### The following files are needed (besides the PHQMD code):
 
 - runinfo.sh
 - runPHQMD.sh
 - batch_runPHQMD.sh
 - 791to891.exe*
-- convert_phqmd_detector_unigen.C / convert_phqmd_detector_unigen_freeze.C 
+- convert_phqmd_detector_unigen.C / convert_phqmd_detector_unigen_freeze.C***** 
 - cluster_table.dat***
 
-Only runinfo.sh needs to be modified:
+### Only runinfo.sh needs to be modified:
 
 - selection of steps
 - option for cluster conversion mode**
@@ -29,11 +29,13 @@ Only runinfo.sh needs to be modified:
 impactparamter etc. 
 - location information
 
-To run, just execute:
+### Run all 3 steps:
 
-. runPHQMD.sh
+	. runPHQMD.sh
 
-* Stabilisation: 791to891.exe converts fort.791 (fort.781) into fort.891 (fort.881) which
+### Comments:
+
+_* Stabilisation: 791to891.exe converts fort.791 (fort.781) into fort.891 (fort.881) which
 considers a clusters as stable when the cluster-baryons are freezed out (and if it has a 
 negative binding energy).
 
@@ -50,8 +52,9 @@ are counted as clusters independent of their physical existence.
 *** The cluster_table.dat contains the information about physical clusters, their baryon 
 content and branching ratio. It is required to perform the conversion and can be easily 
 modified/extended. Each line contains the following information of the respective cluster:
->> name / pdgcode / number of protons / number of neutral baryons / number of Lambdas 
->> / number of Simga0 / branching ratio
+
+	name / pdgcode / number of protons / number of neutral baryons / number of Lambdas 
+	number of Simga0 / branching ratio
 
 **** PHQMD writes baryons and anti-baryons into two separate files. The conversion
 of anti-baryons is optional and can be switched off.
