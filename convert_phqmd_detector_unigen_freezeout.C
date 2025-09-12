@@ -42,6 +42,16 @@
  ** interactions. The information of the origin can be taken from the UniGen-output:
  ** UParticle* particle -> GetStatus(): = 0 kinetic deuteron, = 1 MST deuteron
  **
+ ** ProcessIds for clusters: The UniGen variable fDecay allows to store 3 processIds with 
+ ** 3 digits each. 3 cluster-baryons to be stored are selected according to the following 
+ ** rule: First all processIds for Sigma0s are stored, then for Lambdas, protons and 
+ ** neutrons.
+ ** ProcessIds for channels with deuterons are changed to make them positive 3-digits:
+ ** PHQMD processId -> UniGen fDecay: 1101 -> 701; -1101 -> 801; 1301 -> 703; -1301 -> 803.
+ **
+ ** ParentIds: In the current PHQMD version PHQMD52_Winn only parentIds for phi and K* are 
+ ** available and stored.
+ **
  ** Inputfiles are from PHQMD MST-mode, for SACA-mode, input-files need to be 
  ** replaced by fort.893 & fort.883
  **/             
@@ -62,11 +72,13 @@ struct PHadron {
   Int_t fPdgId;
   TVector3 fP;
   Float_t fEnergy;
+  Int_t fProcessId;    
+  Int_t fInfoId; 
   Int_t fBaryonId;
   TLorentzVector fXTFreeze;
-  TVector3 fPFreeze;
-  PHadron() : fPdgId(0), fEnergy(0.), fBaryonId(0) { fP.SetXYZ(0.,0.,0.); fXTFreeze.SetXYZT(0.,0.,0.,0.); fPFreeze.SetXYZ(0.,0.,0.);  };
-  PHadron(Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, Int_t baryonId, Float_t xposfo, Float_t yposfo, Float_t zposfo , Float_t timefo, Float_t xpfo, Float_t ypfo, Float_t zpfo) : fPdgId(pdgId), fEnergy(energy), fBaryonId(baryonId) { fP.SetXYZ(Px,Py,Pz); fXTFreeze.SetXYZT(xposfo,yposfo,zposfo,timefo); fPFreeze.SetXYZ(xpfo,ypfo,zpfo);  };
+  TLorentzVector fPEFreeze;
+  PHadron() : fPdgId(0), fEnergy(0.), fProcessId(-1), fInfoId(-1), fBaryonId(-1) { fP.SetXYZ(0.,0.,0.); fXTFreeze.SetXYZT(0.,0.,0.,0.); fPEFreeze.SetXYZT(0.,0.,0.,0.);  };
+  PHadron(Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, Int_t processId, Int_t infoId, Int_t baryonId, Float_t xposfo, Float_t yposfo, Float_t zposfo , Float_t timefo, Float_t xpfo, Float_t ypfo, Float_t zpfo, Float_t energyfo) : fPdgId(pdgId), fEnergy(energy), fProcessId(processId), fInfoId(infoId), fBaryonId(baryonId) { fP.SetXYZ(Px,Py,Pz); fXTFreeze.SetXYZT(xposfo,yposfo,zposfo,timefo); fPEFreeze.SetXYZT(xpfo,ypfo,zpfo,energyfo);  };
 };
 
 struct PBaryon {
@@ -74,34 +86,36 @@ struct PBaryon {
   Int_t fnBary;
   TVector3 fP;
   TVector3 fX;
+  Float_t fMass;
   Float_t fEnergy;
   Int_t fBaryonId;
   Int_t fClusterId;
   Float_t fEbin;
   Float_t fTimeFreeze;
-  PBaryon() : fPdgId(0),fnBary(0),fEnergy(0.),fBaryonId(0),fClusterId(0),fEbin(0), fTimeFreeze(0.) { fP.SetXYZ(0.,0.,0.); fX.SetXYZ(0.,0.,0.); };
-  PBaryon(Int_t PdgId, Int_t nBary, Float_t Px, Float_t Py, Float_t Pz, Float_t Mass, Float_t X, Float_t Y, Float_t Z, Int_t baryonId, Int_t clusterId, Float_t TimeFreeze, Float_t Ebin) : fPdgId(PdgId), fnBary(nBary), fBaryonId(baryonId), fClusterId(clusterId), fTimeFreeze(TimeFreeze), fEbin(Ebin) { fP.SetXYZ(Px,Py,Pz); fX.SetXYZ(X,Y,Z); fEnergy = TMath::Sqrt(Mass*Mass +Px*Px + Py*Py + Pz*Pz); };
+  PBaryon() : fPdgId(0),fnBary(0),fMass(0.),fEnergy(0.),fBaryonId(0),fClusterId(0),fEbin(0), fTimeFreeze(0.) { fP.SetXYZ(0.,0.,0.); fX.SetXYZ(0.,0.,0.); };
+  PBaryon(Int_t PdgId, Int_t nBary, Float_t Px, Float_t Py, Float_t Pz, Float_t X, Float_t Y, Float_t Z, Float_t Mass, Int_t baryonId, Int_t clusterId, Float_t TimeFreeze, Float_t Ebin) : fPdgId(PdgId), fnBary(nBary), fMass(Mass), fBaryonId(baryonId), fClusterId(clusterId), fTimeFreeze(TimeFreeze), fEbin(Ebin) { fP.SetXYZ(Px,Py,Pz); fX.SetXYZ(X,Y,Z); fEnergy = TMath::Sqrt(Mass*Mass +Px*Px + Py*Py + Pz*Pz); };
 };
 
 struct PBaryon_cluster {
   Int_t fPdgId;
   TVector3 fP;
+  Float_t fMass;
   Float_t fEnergy;
   Float_t fEbin;
   Float_t fTimeFreeze;
   TLorentzVector fXTFreeze;
-  TVector3 fPFreeze;
+  TLorentzVector fPEFreeze;
   Int_t fBaryonId;
-  Int_t fClusterId;
-  PBaryon_cluster(Int_t baryonId, Int_t PdgId, TVector3 P, Float_t energy, TLorentzVector XTFreeze, TVector3 PFreeze, Float_t Ebin) : fBaryonId(baryonId), fPdgId(PdgId), fP(P), fEnergy(energy), fXTFreeze(XTFreeze), fPFreeze(PFreeze), fEbin(Ebin) {};
+  Int_t fProcessId;
+  PBaryon_cluster(Int_t baryonId, Int_t PdgId, Int_t processId, TVector3 P, Float_t mass, Float_t energy, TLorentzVector XTFreeze, TLorentzVector PEFreeze, Float_t Ebin) : fBaryonId(baryonId), fPdgId(PdgId), fProcessId(processId), fP(P), fMass(mass), fEnergy(energy), fXTFreeze(XTFreeze), fPEFreeze(PEFreeze), fEbin(Ebin) {};
 };
 
 class PEvent : public TObject  {
 public:
   Int_t fEventId;
   Int_t fStepNr;
-  Int_t fnParticipants;
-  Float_t fb;
+  Int_t fNParticipants;
+  Float_t fB;
   Float_t fTime;
   Float_t fPhi;
   vector<PHadron> fhadrons;
@@ -113,34 +127,35 @@ class ParticleFreeze : public TObject {
 public:
   Int_t fIndex;
   Int_t fPdgId;
+  Int_t fParent;
+  Int_t fDecay;
   TVector3 fP;
   Float_t fEnergy;
   Float_t fTimeFreeze;
   TVector3 fXFreeze;
   TVector3 fPFreeze;
+  Float_t  fEnergyFreeze; 
   Int_t fOrigin;
-  ParticleFreeze() : fIndex(0), fPdgId(0), fEnergy(0.), fTimeFreeze(0.), fOrigin(0) {fP.SetXYZ(0.,0.,0.); fXFreeze.SetXYZ(0.,0.,0.); fPFreeze.SetXYZ(0.,0.,0.); };
-  ParticleFreeze(Int_t index, Int_t pdgId, TVector3 P, Float_t energy, TLorentzVector XFreeze, TVector3 PFreeze, Int_t Origin) : fIndex(index), fPdgId(pdgId), fP(P), fEnergy(energy), fPFreeze(PFreeze), fOrigin(Origin) {fTimeFreeze = XFreeze.T(); fXFreeze.SetXYZ(XFreeze.X(), XFreeze.Y(), XFreeze.Z()); };
-  ParticleFreeze(Int_t index, Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, Float_t TimeFreeze, TVector3 XFreeze, TVector3 PFreeze, Int_t Origin) : fIndex(index), fPdgId(pdgId), fEnergy(energy), fTimeFreeze(TimeFreeze), fXFreeze(XFreeze), fPFreeze(PFreeze), fOrigin(Origin) {fP.SetXYZ(Px, Py, Pz); };
-  ParticleFreeze(Int_t index, Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, TLorentzVector XFreeze, TVector3 PFreeze, Int_t Origin) : fIndex(index), fPdgId(pdgId), fEnergy(energy), fPFreeze(PFreeze), fOrigin(Origin) {fP.SetXYZ(Px, Py, Pz); fTimeFreeze = XFreeze.T(); fXFreeze.SetXYZ(XFreeze.X(), XFreeze.Y(), XFreeze.Z()); };
+  Int_t fWeight;
+  ParticleFreeze() : fIndex(-1), fPdgId(0), fParent(-1), fDecay(-1), fEnergy(0.), fTimeFreeze(0.), fOrigin(0), fWeight(0) {fP.SetXYZ(0.,0.,0.); fXFreeze.SetXYZ(0.,0.,0.); fPFreeze.SetXYZ(0.,0.,0.); };
+  ParticleFreeze(Int_t index, Int_t pdgId, Int_t parent, Int_t decay, TVector3 P, Float_t energy, TLorentzVector XTFreeze, TLorentzVector PEFreeze, Int_t origin, Int_t weight) : fIndex(index), fPdgId(pdgId), fParent(parent), fDecay(decay), fP(P), fEnergy(energy), fOrigin(origin), fWeight(weight) {fTimeFreeze = XTFreeze.T(); fXFreeze.SetXYZ(XTFreeze.X(), XTFreeze.Y(), XTFreeze.Z()); fPFreeze.SetXYZ(PEFreeze.X(), PEFreeze.Y(), PEFreeze.Z()); fEnergyFreeze = PEFreeze.T();};
+  ParticleFreeze(Int_t index, Int_t pdgId, Int_t parent, Int_t decay, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, Float_t TimeFreeze, TVector3 XFreeze, TVector3 PFreeze, Float_t energyFreeze, Int_t origin, Int_t weight) : fIndex(index), fPdgId(pdgId), fParent(parent), fDecay(decay), fEnergy(energy), fTimeFreeze(TimeFreeze), fXFreeze(XFreeze), fPFreeze(PFreeze), fEnergyFreeze(energyFreeze), fOrigin(origin), fWeight(weight) {fP.SetXYZ(Px, Py, Pz); };
   ClassDef(ParticleFreeze, 1);
 };
 
 class EventFreeze : public TObject  {
 public:
   Int_t fEventId;
-  Float_t fb;
+  Float_t fB;
+  Int_t fNParticipants;
   Float_t fTime;
   Float_t fPhi;
-  Int_t fnParticipants;
   Int_t fNpa;
-  vector<ParticleFreeze> fparticles;
-  void SetParameters(Int_t eventId, Float_t b, Float_t time, Float_t phi, Int_t nParticipants) { fEventId = eventId; fb = b; fTime = time; fPhi = phi; fnParticipants = nParticipants;};
-  void AddParticle(Int_t index, Int_t pdgId, TVector3 P, Float_t energy, TLorentzVector XTFreeze, TVector3 PFreeze, Int_t Origin) { fparticles.push_back(ParticleFreeze(index, pdgId, P, energy, XTFreeze, PFreeze, Origin)); fNpa += 1; }; 
-  void AddParticle(Int_t index, Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, Float_t TimeFreezeCluster, TVector3 posfo_cluster, TVector3 pfo_cluster, Int_t Origin) { fparticles.push_back(ParticleFreeze(index, pdgId, Px, Py, Pz, energy, TimeFreezeCluster, posfo_cluster, pfo_cluster, Origin)); fNpa += 1; }; 
-  void AddParticle(Int_t index, Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, TLorentzVector XTFreeze, TVector3 PFreeze, Int_t Origin) {
-    fparticles.push_back(ParticleFreeze(index, pdgId, Px, Py, Pz, energy, XTFreeze, PFreeze, Origin)); fNpa += 1; };
-  void Clear() { fparticles.clear(); fNpa = 0; };
+  vector<ParticleFreeze> fParticles;
+  void SetParameters(Int_t eventId, Float_t b, Int_t nParticipants, Float_t time, Float_t phi) { fEventId = eventId; fB = b; fTime = time; fPhi = phi; fNParticipants = nParticipants;};
+  void AddParticle(Int_t index, Int_t pdgId, Int_t parent, Int_t decay, TVector3 P, Float_t energy, TLorentzVector XTFreeze, TLorentzVector PEFreeze, Int_t origin, Int_t weight) { fParticles.push_back(ParticleFreeze(index, pdgId, parent, decay, P, energy, XTFreeze, PEFreeze, origin, weight)); fNpa += 1; }; 
+  void AddParticle(Int_t index, Int_t pdgId, Int_t parent, Int_t decay, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, Float_t timefo, TVector3 posfo, TVector3 pfo, Float_t energyfo, Int_t origin, Int_t weight) { fParticles.push_back(ParticleFreeze(index, pdgId, parent, decay, Px, Py, Pz, energy, timefo, posfo, pfo, energyfo, origin, weight)); fNpa += 1; }; 
+  void Clear() { fParticles.clear(); fNpa = 0; };
   ClassDef(EventFreeze, 1);
 };
 
@@ -163,6 +178,20 @@ void GetPdgIdBaryon(Int_t charge, Int_t &pdgId, Bool_t IsAnti)
   if (TMath::Abs(charge) == 18) pdgId = 3212;
 
   if (IsAnti == kTRUE) pdgId *= -1;
+}
+
+Int_t ChangeProcessId3digits(Int_t processId) {
+
+  /** Change processIds for channels with deuterons to make them positive 3-digits **/
+  
+  Int_t processId_3digits = processId;
+  if (TMath::Abs(processId) > 999) {
+    if ( processId == 1101 ) processId_3digits = 701; 
+    if ( processId == -1101) processId_3digits = 801;
+    if ( processId == 1301 ) processId_3digits = 703;
+    if ( processId == -1301) processId_3digits = 803; 
+  }
+  return processId_3digits;
 }
 
 void GetClusterList(TString clustertablename, std::vector<ClusterEntry> &clusterlist)
@@ -275,11 +304,84 @@ void CalculateClusterKin(std::vector<PBaryon_cluster> baryons_cluster, Float_t &
     Px += baryons_cluster.at(ibary).fP.X();
     Py += baryons_cluster.at(ibary).fP.Y();
     Pz += baryons_cluster.at(ibary).fP.Z();
-    if (TMath::Abs(pdgId) == 2212 || TMath::Abs(pdgId) == 2112) Mass += 0.938;
-    if (TMath::Abs(pdgId) == 3122) Mass += 1.116;
-    if (TMath::Abs(pdgId) == 3212) Mass += 1.193;
+    Mass += baryons_cluster.at(ibary).fMass;
   }
   energy = TMath::Sqrt(Mass*Mass+Px*Px+Py*Py+Pz*Pz);
+}
+
+void GetClusterProcessId(std::vector<PBaryon_cluster> baryons_cluster, Int_t &processId)
+{  
+  const Int_t npos = 3;
+  Int_t nbary = baryons_cluster.size();
+
+  std::vector<PBaryon_cluster> baryons_cluster_sorted =  baryons_cluster;
+
+  for (int ibary = 1; ibary < nbary ; ibary++) {  
+    PBaryon_cluster baryon_tmp = baryons_cluster_sorted.at(ibary);
+    Int_t pdgId_tmp = baryons_cluster_sorted.at(ibary).fPdgId;
+    Int_t ibary_tmp = ibary;
+    for (int jbary = ibary - 1; jbary >= 0; jbary --) {
+      if (pdgId_tmp > baryons_cluster_sorted.at(jbary).fPdgId) {
+	baryons_cluster_sorted.at(ibary_tmp) = baryons_cluster_sorted.at(jbary);
+	baryons_cluster_sorted.at(jbary) = baryon_tmp;	
+	ibary_tmp --; 
+      }
+    }
+  }
+   
+  std::vector<Int_t> poswrite;
+  poswrite.resize(nbary);
+    
+  if (nbary <= 3) {
+    for (int ibary = 0; ibary < nbary ; ibary++)
+      poswrite.at(ibary) = 1;
+  }
+  else {
+    std::array<Int_t, 4> nspecies = {0, 0, 0, 0}; // number of sigma0, lambda, proton, neutron
+    for (int ibary = 0; ibary < nbary; ibary++) {
+      Int_t pdgId = baryons_cluster.at(ibary).fPdgId;
+      if (TMath::Abs(pdgId) == 3212) nspecies.at(0) ++;
+      if (TMath::Abs(pdgId) == 3122) nspecies.at(1) ++;
+      if (TMath::Abs(pdgId) == 2212) nspecies.at(2) ++;
+      if (TMath::Abs(pdgId) == 2112) nspecies.at(3) ++;
+    }
+    Int_t nfree = npos; Int_t ipos_last = 0;
+    for (int ispec = 0; ispec < 4; ispec ++) {
+      if (nspecies.at(ispec) <= nfree) {
+	nfree -= nspecies.at(ispec);
+	for (int ipos = ipos_last; ipos < ipos_last + nspecies.at(ispec); ipos++) {
+	  poswrite.at(ipos) = 1;
+	}
+	ipos_last += nspecies.at(ispec);
+	if (nfree == 0) {
+	  for (int ipos = ipos_last; ipos < nbary; ipos++)
+	    poswrite.at(ipos) = 0;
+	  break;
+	}
+      }
+      else {
+	for (int ipos = ipos_last; ipos < ipos_last + nspecies.at(ispec); ipos++) 
+	  poswrite.at(ipos) = 0;
+	ipos_last += nspecies.at(ispec);
+      }
+
+    }
+  }
+
+  Int_t ipos = 0;
+  processId = 1e9;
+  for (int ibary = 0; ibary < nbary; ibary++) {
+    if (poswrite.at(ibary) == 1) {
+      processId += TMath::Abs(baryons_cluster_sorted.at(ibary).fProcessId) * 1e6 / TMath::Power(10,3*ipos);
+      ipos ++;
+    }
+  }
+
+  if (ipos < npos) {
+  Int_t ipos_last = ipos;
+  for (int ipos = ipos_last; ipos < npos; ipos++)
+    processId += 999 * 1e6 / TMath::Power(10,3*ipos);
+  }
 }
 
 void CalculateClusterProductionTime(Int_t eventId, Int_t final_step, Int_t clusterId, Int_t nbary, Float_t &TimeProductionCluster)
@@ -338,10 +440,10 @@ void CalculateClusterFreezeOutTime(Int_t eventId, std::vector<PBaryon_cluster> b
 }
 
 void convert_phqmd_detector_unigen_freezeout(TString indir = "",
-					     TString dataset = "00001",
+					     TString dataset = "",
 					     Int_t firstevent = 0,
 					     Bool_t ConvertAllClusters = kTRUE,
-				      	     Bool_t ConvertAnti = kFALSE,
+				      	     Bool_t ConvertAnti = kTRUE,
 		      			     Bool_t WriteUnigen = kTRUE,
 	      				     Bool_t WriteEventFreeze = kTRUE)
 {
@@ -463,16 +565,16 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 	event->fEventId = firstevent + isub*NUM + irun;
 	event->fStepNr = it;
 	  
-	Int_t nPart, pdgId, charge, baryonId;
-	Float_t Px, Py, Pz, energy, xposfo, yposfo, zposfo, timefo, xpfo, ypfo, zpfo;
+	Int_t nPart, pdgId, charge, baryonId, processId, infoId;
+	Float_t Px, Py, Pz, energy, xposfo, yposfo, zposfo, timefo, xpfo, ypfo, zpfo, energyfo;
 
 	//Get Hadrons from phsd.dat
 
 	if (it == NTIME) {
 
-	  if(fscanf(BulkFile, "%i %*i %*i %f %*i %*i %*i %*f %*f\n", &nPart, &event->fb)==EOF)
+	  if(fscanf(BulkFile, "%i %*i %*i %f %*i %*i %*i %*f %*f\n", &nPart, &event->fB)==EOF)
 	    throw runtime_error("Unexpected end of file phsd.dat at run " + to_string(irun));	
-	  if(fscanf(BulkFile, "%i %f %*[^\n]%*c", &event->fnParticipants, &event->fPhi)==EOF)   
+	  if(fscanf(BulkFile, "%i %f %*[^\n]%*c", &event->fNParticipants, &event->fPhi)==EOF)   
 	    throw runtime_error("Unexpected end of file phsd.dat at run " + to_string(irun));
 
 	  outputTmp->cd();
@@ -480,14 +582,18 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 	  
 	  for (int i = 0; i < nPart; i++) {
 
-	    if(fscanf(BulkFile, "%i %i %f %f %f %f %*i %*i %i %*f %*f %*f %f %f %f %f %f %f %f %*f %*f %*f\n", &pdgId, &charge, &Px, &Py, &Pz, &energy, &baryonId, &xposfo, &yposfo, &zposfo, &timefo, &xpfo, &ypfo, &zpfo)==EOF) {	
+	    if(fscanf(BulkFile, "%i %i %f %f %f %f %i %i %i %*f %*f %*f %f %f %f %f %f %f %f %f %*f %*f\n", &pdgId, &charge, &Px, &Py, &Pz, &energy, &processId, &infoId, &baryonId, &xposfo, &yposfo, &zposfo, &timefo, &xpfo, &ypfo, &zpfo, &energyfo)==EOF) {	
 	      throw runtime_error("Unexpected end of file phsd.dat at run " + to_string(irun) + " particle " + to_string(i));
 	    }
 	      
 	    if((pdgId<1000 && pdgId>-1000) || TMath::Abs(pdgId) == 100121) baryonId = -1;
-	    if(TMath::Abs(pdgId) == 100121) pdgId = 1000010020*charge; // correct pdg-code for kinetic deuterons    
+	    if(TMath::Abs(pdgId) == 100121) pdgId = 1000010020*charge; // correct pdg-code for kinetic deuterons
+
+	    if (TMath::Abs(processId) > 999)
+	      processId = ChangeProcessId3digits(processId); // change processIds for channels with deuterons to make them positive 3-digits
+	 	    
 	    outputTmp->cd();
-	    event->fhadrons.push_back(PHadron(pdgId, Px, Py, Pz, energy, baryonId, xposfo, yposfo, zposfo ,timefo, xpfo,ypfo,zpfo));
+	    event->fhadrons.push_back(PHadron(pdgId, Px, Py, Pz, energy, processId, infoId, baryonId, xposfo, yposfo, zposfo ,timefo, xpfo,ypfo,zpfo, energyfo));
 	  } 
 	} 
 
@@ -516,7 +622,7 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 
 	  GetPdgIdBaryon(charge, pdgId, IsAnti);
 	  outputTmp->cd();
-	  event->fbaryons.push_back(PBaryon(pdgId, nBary, Px, Py, Pz, Mass, Xpos, Ypos, Zpos, baryonId, clusterId, TimeFreeze, Ebin));
+	  event->fbaryons.push_back(PBaryon(pdgId, nBary, Px, Py, Pz, Xpos, Ypos, Zpos, Mass, baryonId, clusterId, TimeFreeze, Ebin));
 	} 
 
 	// Get Anti-Baryons Friga from fort.881
@@ -539,7 +645,7 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 
 	    GetPdgIdBaryon(charge, pdgId, IsAnti);
 	    outputTmp->cd();
-	    event->fbaryons.push_back(PBaryon(pdgId, nBary, Px, Py, Pz, Mass, Xpos, Ypos, Zpos, baryonId, -clusterId, TimeFreeze, Ebin));
+	    event->fbaryons.push_back(PBaryon(pdgId, nBary, Px, Py, Pz, Xpos, Ypos, Zpos, Mass, baryonId, -clusterId, TimeFreeze, Ebin));
 	  } 
 	} 
 	treeTmp->Fill();
@@ -638,19 +744,20 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
    
     if(event->fStepNr == NTIME) {
 
-      Int_t index=0;
+      Int_t index = 0 ;
+      Int_t parentId = -1;
       Int_t child[2] = {0,0};
       
       if (WriteUnigen == kTRUE) {
 	output->cd();
 	uevent->Clear();
-	uevent->SetParameters(event->fEventId, event->fb, event->fPhi, event->fnParticipants, 1, event->fTime, 0);
+	uevent->SetParameters(event->fEventId, event->fB, event->fPhi, event->fNParticipants, 1, event->fTime, 0);
       }
       
       if (WriteEventFreeze == kTRUE) {
 	outputFreeze->cd();
 	eventFreeze->Clear();
-	eventFreeze->SetParameters(event->fEventId, event->fb, event->fTime, event->fPhi, event->fnParticipants);
+	eventFreeze->SetParameters(event->fEventId, event->fB, event->fNParticipants, event->fTime, event->fPhi);
       }
       
       outputTmp->cd(); // Loop over hadrons
@@ -658,14 +765,17 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 	auto it_bar2had = baryons2hadrons[ievent].find(hadron.fBaryonId);	
 	if (it_bar2had != baryons2hadrons[ievent].end()) continue; // baryon is part of a cluster
 
+	if (TMath::Abs(hadron.fPdgId) == 333 || TMath::Abs(hadron.fPdgId) == 313 || TMath::Abs(hadron.fPdgId) == 323) parentId = hadron.fInfoId;
+	else parentId = -1;
+
 	if (WriteUnigen == kTRUE) {
 	  output->cd();
-	  uevent->AddParticle (index, hadron.fPdgId, 0, -1, -1, -1, -1, child, hadron.fP.X(), hadron.fP.Y(),hadron.fP.Z(), hadron.fEnergy, hadron.fXTFreeze.X(), hadron.fXTFreeze.Y(), hadron.fXTFreeze.Z(), hadron.fXTFreeze.T(), 1);
+	  uevent->AddParticle (index, hadron.fPdgId, 0, parentId, -1, -1, hadron.fProcessId, child, hadron.fP.X(), hadron.fP.Y(),hadron.fP.Z(), hadron.fEnergy, hadron.fXTFreeze.X(), hadron.fXTFreeze.Y(), hadron.fXTFreeze.Z(), hadron.fXTFreeze.T(), 1);
 	}
 	  
 	if (WriteEventFreeze == kTRUE) {
 	  outputFreeze->cd();
-	  eventFreeze->AddParticle(index, hadron.fPdgId, hadron.fP, hadron.fEnergy, hadron.fXTFreeze, hadron.fPFreeze, 0);
+	  eventFreeze->AddParticle(index, hadron.fPdgId, parentId, hadron.fProcessId, hadron.fP, hadron.fEnergy, hadron.fXTFreeze, hadron.fPEFreeze, 0, 1);
 	}
 	index++;    		  
       } // end loop hadrons
@@ -686,19 +796,19 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 	  auto it_had = baryons2hadrons[ievent].find(baryon.fBaryonId);
 	  Int_t hadronId = it_had->second;
 	  PHadron hadron = event->fhadrons[hadronId];
-
-	  baryons_cluster.push_back(PBaryon_cluster(baryonId, baryon.fPdgId, baryon.fP, baryon.fEnergy, hadron.fXTFreeze, hadron.fPFreeze, baryon.fEbin));	    
+	  
+	  baryons_cluster.push_back(PBaryon_cluster(baryonId, baryon.fPdgId, hadron.fProcessId, baryon.fP, baryon.fMass, baryon.fEnergy, hadron.fXTFreeze, hadron.fPEFreeze, baryon.fEbin));	    
 	}
 	
 	if (nbary == 1) {
 	  Int_t ibary  = 0;
 	  if (WriteUnigen == kTRUE) {
 	    output->cd();
-	    uevent->AddParticle (index, baryons_cluster.at(ibary).fPdgId, 1, -1, -1, -1, -1, child, baryons_cluster.at(ibary).fP.X(), baryons_cluster.at(ibary).fP.Y(), baryons_cluster.at(ibary).fP.Z(), baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze.X(), baryons_cluster.at(ibary).fXTFreeze.Y(), baryons_cluster.at(ibary).fXTFreeze.Z(), baryons_cluster.at(ibary).fXTFreeze.T(), 1);
+	    uevent->AddParticle (index, baryons_cluster.at(ibary).fPdgId, 1, -1, -1, -1, baryons_cluster.at(ibary).fProcessId, child, baryons_cluster.at(ibary).fP.X(), baryons_cluster.at(ibary).fP.Y(), baryons_cluster.at(ibary).fP.Z(), baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze.X(), baryons_cluster.at(ibary).fXTFreeze.Y(), baryons_cluster.at(ibary).fXTFreeze.Z(), baryons_cluster.at(ibary).fXTFreeze.T(), 1);
 	  }	  
 	  if (WriteEventFreeze == kTRUE) {
 	    outputFreeze->cd();
-	    eventFreeze->AddParticle(index, baryons_cluster.at(ibary).fPdgId, baryons_cluster.at(ibary).fP, baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze, baryons_cluster.at(ibary).fPFreeze, 1);
+	    eventFreeze->AddParticle(index, baryons_cluster.at(ibary).fPdgId, -1, baryons_cluster.at(ibary).fProcessId, baryons_cluster.at(ibary).fP, baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze, baryons_cluster.at(ibary).fPEFreeze, 1, 1);
 	  }	  
 	  index++;
 	}
@@ -709,21 +819,23 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 	  Float_t Ebin = CalculateClusterBindingEnergy(baryons_cluster);
 	  
 	  if (pdgId != 99999 && Ebin/nbary < Ebin_max) {	   
-	    Float_t Px = 0; Float_t Py = 0; Float_t Pz = 0; Float_t energy = 0; 
+	    Float_t Px = 0; Float_t Py = 0; Float_t Pz = 0; Float_t energy = 0;
 	    CalculateClusterKin(baryons_cluster, Px, Py, Pz, energy);
+
+	    Int_t clusterProcessId = -1;
+	    GetClusterProcessId(baryons_cluster, clusterProcessId);
 	    
 	    //Calculate Cluster freeze-out coordinates
 	    Float_t TimeProductionCluster = 0.0;
 	    CalculateClusterProductionTime(event->fEventId, NTIME, clusterId, nbary, TimeProductionCluster);
 	    Float_t TimeFreezeCluster = 0.0 ;Float_t deltaT = 0.0; Int_t TsFreeze = 0;
 	    CalculateClusterFreezeOutTime(event->fEventId, baryons_cluster, nbary, TimeProductionCluster, TsFreeze, TimeFreezeCluster, deltaT);
-	    
+ 
 	    auto it_eventnr = eventId2Entry.find(event->fEventId);
 	    Int_t eventNrFreeze = it_eventnr -> second[TsFreeze];
 	    treeTmp->GetEntry(eventNrFreeze);
 
-	    TVector3 posfo_cluster = {0.0, 0.0, 0.0}; TVector3 pfo_cluster = {0.0, 0.0, 0.0};
-	    
+	    TVector3 posfo_cluster = {0.0, 0.0, 0.0}; TVector3 pfo_cluster = {0.0, 0.0, 0.0}; Float_t mass_cluster = 0;
 	    for (int ibary = 0; ibary < nbary; ibary++) {	      
 		auto it_bary = baryonId2pos[eventNrFreeze].find(baryons_cluster.at(ibary).fBaryonId);
 		PBaryon baryon_fo = event->fbaryons[it_bary->second];
@@ -734,19 +846,34 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 		    posfo_cluster(i) +=  baryons_cluster.at(ibary).fXTFreeze(i);
 		  pfo_cluster(i) +=  baryon_fo.fP(i);
 		}
+		mass_cluster += baryon_fo.fMass;
 	    }
 	    for (int i = 0; i < 3; i++)
 	      posfo_cluster(i) /= nbary;
 
+	    Float_t energyfo_cluster = TMath::Sqrt(mass_cluster*mass_cluster + pfo_cluster(0)* pfo_cluster(0) + pfo_cluster(1)* pfo_cluster(1) + pfo_cluster(2)* pfo_cluster(2));
+
 	    treeTmp->GetEntry(ievent);
 
+	    Int_t weight;
+	    
 	    if (WriteUnigen == kTRUE) {
-	      output->cd(); 
-	      uevent->AddParticle (index, pdgId, 1, -1, -1, -1, -1, child, Px, Py, Pz, energy, posfo_cluster.X(), posfo_cluster.Y(), posfo_cluster.Z(), TimeFreezeCluster, 1);
+	      output->cd();
+	      weight = 1;
+	      uevent->AddParticle (index, pdgId, 1, -1, -1, -1, clusterProcessId, child, Px, Py, Pz, energy, posfo_cluster.X(), posfo_cluster.Y(), posfo_cluster.Z(), TimeFreezeCluster, weight);
+	      weight = 0;
+	      for (int ibary=0;ibary<nbary;ibary++) // store single baryons with weight = 0
+	      	uevent->AddParticle (index, baryons_cluster.at(ibary).fPdgId, 1, -1, -1, -1, baryons_cluster.at(ibary).fProcessId, child, baryons_cluster.at(ibary).fP.X(), baryons_cluster.at(ibary).fP.Y(), baryons_cluster.at(ibary).fP.Z(), baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze.X(), baryons_cluster.at(ibary).fXTFreeze.Y(), baryons_cluster.at(ibary).fXTFreeze.Z(), baryons_cluster.at(ibary).fXTFreeze.T(), weight);
+ 
 	    }	    
 	    if (WriteEventFreeze == kTRUE) {
 	      outputFreeze->cd();
-	      eventFreeze->AddParticle(index, pdgId, Px, Py, Pz, energy, TimeFreezeCluster, posfo_cluster, pfo_cluster, 1);
+	      weight = 1;
+	      eventFreeze->AddParticle(index, pdgId, -1, clusterProcessId, Px, Py, Pz, energy, TimeFreezeCluster, posfo_cluster, pfo_cluster, energyfo_cluster, 1, weight);
+	      weight = 0;
+	      for (int ibary=0;ibary<nbary;ibary++) // store single baryons with weight = 0
+		eventFreeze->AddParticle(index, baryons_cluster.at(ibary).fPdgId, -1, baryons_cluster.at(ibary).fProcessId, baryons_cluster.at(ibary).fP, baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze, baryons_cluster.at(ibary).fPEFreeze, 1, weight);
+	      
 	    }	    
 	    index++;
 	  }
@@ -754,11 +881,11 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
 	    for (int ibary=0;ibary<nbary;ibary++) {
 	      if (WriteUnigen == kTRUE) {
 		output->cd();
-		uevent->AddParticle (index, baryons_cluster.at(ibary).fPdgId, 1, -1, -1, -1, -1, child, baryons_cluster.at(ibary).fP.X(), baryons_cluster.at(ibary).fP.Y(), baryons_cluster.at(ibary).fP.Z(), baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze.X(), baryons_cluster.at(ibary).fXTFreeze.Y(), baryons_cluster.at(ibary).fXTFreeze.Z(), baryons_cluster.at(ibary).fXTFreeze.T(), 1);
+		uevent->AddParticle (index, baryons_cluster.at(ibary).fPdgId, 1, -1, -1, -1, baryons_cluster.at(ibary).fProcessId, child, baryons_cluster.at(ibary).fP.X(), baryons_cluster.at(ibary).fP.Y(), baryons_cluster.at(ibary).fP.Z(), baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze.X(), baryons_cluster.at(ibary).fXTFreeze.Y(), baryons_cluster.at(ibary).fXTFreeze.Z(), baryons_cluster.at(ibary).fXTFreeze.T(), 1);
 	      }	      
 	      if (WriteEventFreeze == kTRUE) {
 		outputFreeze->cd();
-		eventFreeze->AddParticle(index, baryons_cluster.at(ibary).fPdgId, baryons_cluster.at(ibary).fP, baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze, baryons_cluster.at(ibary).fPFreeze, 1);
+		eventFreeze->AddParticle(index, baryons_cluster.at(ibary).fPdgId, -1, baryons_cluster.at(ibary).fProcessId, baryons_cluster.at(ibary).fP, baryons_cluster.at(ibary).fEnergy, baryons_cluster.at(ibary).fXTFreeze, baryons_cluster.at(ibary).fPEFreeze, 1, 1);
 	      }	      
 	      index++;
 	    }

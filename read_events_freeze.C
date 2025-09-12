@@ -9,36 +9,72 @@
 #include "TString.h"
 #include <iostream>
 
-class ParticleFreeze {
+class ParticleFreeze : public TObject {
+private:
+  Int_t fIndex;
+  Int_t fPdgId;               // PDG code
+  Int_t fParent;              // Index of parent (only available for phi and K* with current PHQMD version)
+  Int_t fDecay;               // decay index = type of process / reaction from which particle comes
+  TVector3 fP;                // 3-momentum at final time (pz, py, pz) (GeV/c)
+  Float_t fEnergy;            // Energy (GeV/c)
+  Float_t fTimeFreeze;        // Freezeout-time (fm/c)
+  TVector3 fXFreeze;          // Position at freezeout-time (fm)
+  TVector3 fPFreeze;          // 3-momentum at freezeout-time (pz, py, pz) (GeV/c)
+  Float_t  fEnergyFreeze;     // energy at freezeout-time (GeV)
+  Int_t fOrigin;              // Information about origin of deuterons: = 0: kinetic deuteron (from phsd.dat), = 1: potential/MST deuteron (from fort.891)
+  Int_t fWeight;              // weight
+
 public:
-  Int_t    fPdgId;        // PDG code
-  TVector3 fP;            // 3-momentum at final time (pz, py, pz) (GeV/c)
-  Float_t  fEnergy;       // Energy (GeV/c)
-  Float_t  fTimeFreeze;   // Freezeout-time (fm/c)
-  TVector3 fXFreeze;      // Position at freezeout-time (fm)
-  TVector3 fPFreeze;      // 3-momentum at freezeout-time (pz, py, pz) (GeV/c)
-  Int_t    fOrigin;       // Information about origin of deuterons: = 0: kinetic deuteron (from phsd.dat), = 1: potential/MST deuteron (from fort.891)
-  ParticleFreeze() : fPdgId(0), fEnergy(0.), fTimeFreeze(0.), fOrigin(0) {fP.SetXYZ(0.,0.,0.); fXFreeze.SetXYZ(0.,0.,0.); fPFreeze.SetXYZ(0.,0.,0.); };
-  ParticleFreeze(Int_t pdgId, TVector3 P, Float_t energy, TLorentzVector XFreeze, TVector3 PFreeze, Int_t Origin) : fPdgId(pdgId), fP(P), fEnergy(energy), fPFreeze(PFreeze), fOrigin(Origin) {fTimeFreeze = XFreeze.T(); fXFreeze.SetXYZ(XFreeze.X(), XFreeze.Y(), XFreeze.Z()); };
-  ParticleFreeze(Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, Float_t TimeFreeze, TVector3 XFreeze, TVector3 PFreeze, Int_t Origin) : fPdgId(pdgId), fEnergy(energy), fTimeFreeze(TimeFreeze), fXFreeze(XFreeze), fPFreeze(PFreeze), fOrigin(Origin) {fP.SetXYZ(Px, Py, Pz); };
-  ParticleFreeze(Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, TLorentzVector XFreeze, TVector3 PFreeze, Int_t Origin) : fPdgId(pdgId), fEnergy(energy), fPFreeze(PFreeze), fOrigin(Origin) {fP.SetXYZ(Px, Py, Pz); fTimeFreeze = XFreeze.T(); fXFreeze.SetXYZ(XFreeze.X(), XFreeze.Y(), XFreeze.Z()); };
+  inline Int_t   GetIndex()       const {return fIndex;}
+  inline Int_t   GetPdg()         const {return fPdgId;}
+  inline Int_t   GetParent()      const {return fParent;}
+  inline Int_t   GetDecay()       const {return fDecay;}
+  inline Float_t Px()             const {return fP.X();}
+  inline Float_t Py()             const {return fP.Y();}
+  inline Float_t Pz()             const {return fP.Z();}
+  inline Float_t E()              const {return fEnergy;}
+  inline TLorentzVector GetMomentum() const {return TLorentzVector(fP.X(),fP.Y(),fP.Z(),fEnergy);}
+  inline Float_t XFreeze()        const {return fXFreeze.X();}
+  inline Float_t YFreeze()        const {return fXFreeze.Y();}
+  inline Float_t ZFreeze()        const {return fXFreeze.Z();}
+  inline Float_t TFreeze()        const {return fTimeFreeze;}
+  Float_t EFreeze();       
+  inline TLorentzVector GetPositionFreeze() const {return TLorentzVector(fXFreeze.X(),fXFreeze.Y(),fXFreeze.Z(),fTimeFreeze);}
+  inline Float_t PxFreeze()       const {return fPFreeze.X();}
+  inline Float_t PyFreeze()       const {return fPFreeze.Y();}
+  inline Float_t PzFreeze()       const {return fPFreeze.Z();}
+  inline Float_t EnergyFreeze()   const {return fEnergyFreeze;}   
+  inline TLorentzVector GetMomentumFreeze() const {return TLorentzVector(fPFreeze.X(),fPFreeze.Y(),fPFreeze.Z(),fEnergyFreeze);}
+  inline Int_t   GetOrigin()      const {return fOrigin;}
+  inline Int_t   GetWeight()      const {return fWeight;}
+  
+  ParticleFreeze() : fIndex(-1), fPdgId(0), fParent(-1), fDecay(-1), fEnergy(0.), fTimeFreeze(0.), fOrigin(0), fWeight(0) {fP.SetXYZ(0.,0.,0.); fXFreeze.SetXYZ(0.,0.,0.); fPFreeze.SetXYZ(0.,0.,0.); };
+
+  virtual ~ParticleFreeze() = default;
+
+  ClassDef(ParticleFreeze, 1);
 };
 
 class EventFreeze : public TObject  {
 public:
-  Int_t   fEventId;       // Event Number
-  Float_t fB;             // Impact parameter (fm)
-  Int_t   fNParticipants; // Number of participants
-  Float_t fTime;          // Final time at which event is written out (fm/c)
-  Float_t fPhi;           // Reaction plane angle
-  Int_t   fNpa;           // Number of particles
-  vector<ParticleFreeze> fparticles;
-  void SetParameters(Int_t eventId, Float_t b, Float_t time, Float_t phi) { fEventId = eventId; fB = b; fTime = time; fPhi = phi; };
-  void AddParticle(Int_t pdgId, TVector3 P, Float_t energy, TLorentzVector XFreeze, TVector3 PFreeze, Int_t Origin) { fparticles.push_back(ParticleFreeze(pdgId, P, energy, XFreeze,  PFreeze, Origin)); fNpa += 1; }; 
-  void AddParticle(Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, Float_t TimeFreezeCluster, TVector3 posfo_cluster, TVector3 pfo_cluster, Int_t Origin) { fparticles.push_back(ParticleFreeze(pdgId, Px, Py, Pz, energy, TimeFreezeCluster, posfo_cluster, pfo_cluster, Origin)); fNpa += 1; }; 
-  void AddParticle(Int_t pdgId, Float_t Px, Float_t Py, Float_t Pz, Float_t energy, TLorentzVector XFreeze, TVector3 PFreeze, Int_t Origin) {
-    fparticles.push_back(ParticleFreeze(pdgId, Px, Py, Pz, energy, XFreeze, PFreeze, Origin)); fNpa += 1; };
-  void Clear() { fparticles.clear(); fNpa = 0; };
+  Int_t fEventId;
+  Float_t fB;
+  Int_t fNParticipants;
+  Float_t fTime;
+  Float_t fPhi;
+  Int_t fNpa;
+  vector<ParticleFreeze> fParticles;
+
+  inline Int_t    GetEventId()       const {return fEventId;}
+  inline Float_t  GetB()             const {return fB;}
+  inline Int_t    GetNParticipants() const {return fNParticipants;}
+  inline Int_t    GetTime()          const {return fTime;}
+  inline Float_t  GetPhi()           const {return fPhi;}
+  inline Int_t    GetNpa()           const {return fNpa;}
+  inline std::vector<ParticleFreeze> GetParticleList() const {return fParticles;}
+  ParticleFreeze GetParticle(Int_t index) const;
+
+  void Clear() { fParticles.clear(); fNpa = 0; };
   ClassDef(EventFreeze, 1);
 };
 
@@ -89,57 +125,58 @@ void read_events_freeze() {
   tree->SetBranchAddress("event", &event);
   
   Int_t nevents = tree->GetEntries() ;
-  cout<<<<nevents<<" nevents"endl;
-   
+  cout<<nevents<<" nevents"<<endl;
+
   for (int ievent=0; ievent < tree->GetEntries(); ievent++) {
   
     inFile->cd();
     tree->GetEntry(ievent);
 
     // Get variables for events
-    Int_t EventId = event->fEventId;
-    Float_t b = event->fB;
-    Float_t finaltime = event->fTime;
-    Float_t phi = event->fPhi;
-    Int_t nparticles = event->fNpa;
+    Int_t EventId = event->GetEventId();
+    Float_t b = event->GetB();
+    Float_t finaltime = event->GetTime();
+    Float_t phi = event->GetPhi();
+    Int_t nparticles = event->GetNpa();
     
-    for (auto particle : event->fparticles) {
+    for (auto particle : event->GetParticleList()) {
 
       // Get variables for particles
-      Int_t pdgId = particle.fPdgId;
-      Float_t Px = particle.fP.X();
-      Float_t Py = particle.fP.Y();
-      Float_t Pz = particle.fP.Z();
-      TVector3 mom = particle.fP;
-      Float_t energy = particle.fEnergy;
       
+      Int_t pdgId = particle.GetPdg();
+      Float_t Px = particle.Px();
+      Float_t Py = particle.Py();
+      Float_t Pz = particle.Pz();
+      TLorentzVector mom = particle.GetMomentum();
+      Float_t energy = particle.E();
+
       // For deuterons
-      Int_t origin = particle.fOrigin; // = 0: kinetic deuteron; = 1: potential MST deuteron
+      Int_t origin = particle.GetOrigin(); // = 0: kinetic deuteron; = 1: potential MST deuteron
       
       // Freezeout coordinates
-      Float_t timeFreeze = particle.fTimeFreeze;
-      TVector3 posFreeze = particle.fXFreeze;
-      Float_t XFreeze = particle.fXFreeze.X();
-      Float_t YFreeze = particle.fXFreeze.Y();
-      Float_t ZFreeze = particle.fXFreeze.Z();
-      TVector3 momFreeze = particle.fPFreeze;
-      Float_t pXFreeze = particle.fPFreeze.X();
-      Float_t pYFreeze = particle.fPFreeze.Y();
-      Float_t pZFreeze = particle.fPFreeze.Z();
+      Float_t timeFreeze = particle.TFreeze();
+      TLorentzVector posFreeze = particle.GetPositionFreeze();
+      Float_t XFreeze = particle.XFreeze();
+      Float_t YFreeze = particle.YFreeze();
+      Float_t ZFreeze = particle.ZFreeze();
+      TLorentzVector momFreeze = particle.GetMomentumFreeze();
+      Float_t pXFreeze = particle.PxFreeze();
+      Float_t pYFreeze = particle.PyFreeze();
+      Float_t pZFreeze = particle.PzFreeze();
 
       // Make example histograms
       outFile->cd();
 
       Float_t rapidity =0.5*TMath::Log((energy+Pz)/(energy-Pz));
 
-      htimefreeze->Fill(particle.fTimeFreeze,1.0/nevents);
+      htimefreeze->Fill(timeFreeze,1.0/nevents);
       for (int i = 0; i < 3; i++) {
 	hp[i]->Fill(mom(i),1.0/nevents/binwidth_p);
 	hpfreeze[i]->Fill(momFreeze(i),1.0/nevents/binwidth_p);
 	hxfreeze[i]->Fill(posFreeze(i),1.0/nevents/binwidth_x);
       }
     }
-  }	
+  }
 
   // Plot example histograms
   outFile->cd();
