@@ -1,16 +1,34 @@
 # RUNNING & CONVERTING PHQMD
 
-### 3 steps are required:
+## 3 steps need to be performed:
 
 1) run the PHQMD code
 2) stabilize the cluster output
 3) convert the PHQMD-output into detector-input (UniGen format)
+
 optional:
 4) delete all files, keep only the detector input
 5) merge output files - 100 or 10 outputfiles (for detector simulations) into 1 file
-All 4 steps are performed with the batch-script. Single steps can be switched on or off. 
+All 4 steps are performed with the batch-script. Single steps can be
+switched on or off.
 
-### The following files are needed (besides the PHQMD code):
+## Requirements (besides the PHQMD code)
+
+### Root
+https://root.cern/install/
+
+Root with c++17 standard is recommended.
+
+### UniGen
+https://github.com/FairRootGroup/UniGen
+
+The *path\_to\_unigen\_installation* in macro/rootlogon.C needs to be replaced by the acutal
+location of UniGen:
+
+	LINUX: gSystem->Load("path_to_unigen_installation/install/lib/libunigen.so");
+	MAC:   gSystem->Load("path_to_unigen_installation/install/lib/libunigen.dylib");
+
+## The following files are needed for running and converting:
 
 - runinfo.sh
 - runPHQMD.sh
@@ -19,7 +37,7 @@ All 4 steps are performed with the batch-script. Single steps can be switched on
 - convert_phqmd_detector_unigen.C / convert_phqmd_detector_unigen_freeze.C***** 
 - cluster_table.dat***
 
-### Only runinfo.sh needs to be modified:
+## Only runinfo.sh needs to be modified:
 
 - selection of steps
 - option for cluster conversion mode**
@@ -29,11 +47,11 @@ All 4 steps are performed with the batch-script. Single steps can be switched on
 impactparamter etc. 
 - location information
 
-### Run all 3 steps:
+## Run all 3 steps:
 
 	. runPHQMD.sh
 
-### Comments:
+## Comments:
 
 \* Stabilisation: 791to891.exe converts fort.791 (fort.781) into fort.891 (fort.881) which
 considers a clusters as stable when the cluster-baryons are freezed out (and if it has a 
