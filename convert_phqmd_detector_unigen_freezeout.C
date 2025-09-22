@@ -764,8 +764,8 @@ void convert_phqmd_detector_unigen_freezeout(TString indir = "",
       for (auto hadron : event->fhadrons) { 	
 	auto it_bar2had = baryons2hadrons[ievent].find(hadron.fBaryonId);	
 	if (it_bar2had != baryons2hadrons[ievent].end()) continue; // baryon is part of a cluster
-
-	if (TMath::Abs(hadron.fPdgId) == 333 || TMath::Abs(hadron.fPdgId) == 313 || TMath::Abs(hadron.fPdgId) == 323) parentId = hadron.fInfoId;
+	
+	if (hadron.fInfoId != -1 && (hadron.fProcessId == 5 || hadron.fProcessId == 7)) parentId = hadron.fInfoId;
 	else parentId = -1;
 
 	if (WriteUnigen == kTRUE) {
