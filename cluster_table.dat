@@ -18,4 +18,8 @@ H5LL		3010		1	4	2	0      1
 Helium4L	3006		2	2	1	0      1
 Helium5L	3007		2	3	1	0      1
 Helium6LL	3011		2	4	2	0      1
+H0-dibaryon     3000            0       2       2       0      0.5      
+H0-dibaryon     3001            0       2       2       0      0.5
+LambdaN         3003            0       2       1       0      1
+LambdaNN        3103            0       3       1       0      1
 LLnn            3040            0       4       2       0      1
