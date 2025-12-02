@@ -59,7 +59,7 @@ export ICLUSTER=1               ## enable or disable CLUSTER output
 ##############################################################
 #############  Directories and files #########################
     
-export version_phqmd=phqmd52_winn
+export version_phqmd=PHSD-PHQMD
 export LOCATION=/lustre
 export DIR=$LOCATION/cbm/users/$USER
 export PHQMDDIR=$DIR/$version_phqmd
