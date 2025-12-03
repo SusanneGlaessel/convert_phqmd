@@ -116,16 +116,7 @@ void convert_phsd_detector_unigen_freezeout(TString indir = "",
   cout << "********************************************************************" <<endl;
   
   // -----   In- and output file names   ------------------------------------
-
-  TString inputFileInfo = "inputPHSD";
-  TString inputFileBulk = "phsd.dat";	 
-
-  TString rootFileTmp = "phsd_freeze_tmp.root";
-  TString rootFileDet = "phsd.root";
-  TString rootFileFreeze = "phsd_freeze.root";
  
-  
-  /*
   TString inputFileInfo = Form("%s/inputPHSD",indir.Data());
   TString inputFileBulk = Form("%s/%s/phsd.dat",indir.Data(),dataset.Data());
 
@@ -137,7 +128,7 @@ void convert_phsd_detector_unigen_freezeout(TString indir = "",
   if (WriteEventFreeze == kTRUE) {
     rootFileFreeze = Form("%s/%s.phsd_freeze.root",outdir.Data(),dataset.Data());
   }
-  */
+
   cout << endl;
   cout << "Input files are: " << endl;
   cout << inputFileInfo << endl;
