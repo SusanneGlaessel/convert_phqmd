@@ -40,7 +40,6 @@ if [ "$MakeDetectorInput" == 1 ]; then
 
     echo "UniGen files will be written to: ${OUTUNIGEN}"  
     cp $SCRIPTDIR/$script_convert $OUTUNIGEN
-    cp $SCRIPTDIR/cluster_table.dat $OUTUNIGEN
     if [ "$USE_CBMROOT" == 0 ]; then 
 	 cp $UNIGEN_SOURCE/rootlogon.C $OUTUNIGEN
     fi

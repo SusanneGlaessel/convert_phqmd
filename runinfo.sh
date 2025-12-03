@@ -4,13 +4,13 @@
 ## Options for running PHQMD code, stabilisation & conversion #
 
 ## Steps:
-export RunPhqmdCode=0           ## = 1: run PHQMD code - input: inputPHSD, output: phsd.dat (hadrons), fort.791 (cluster-baryons), fort.891 (anti-cluster-baryons)
+export RunPhqmdCode=1           ## = 1: run PHQMD code - input: inputPHSD, output: phsd.dat (hadrons), fort.791 (cluster-baryons), fort.891 (anti-cluster-baryons)
 export MakeDetectorInput=1      ## = 1: run conversion of PHQMD output into detector input - input: fort.891 & fort.881, output: unigen format
 
 ## Options for freeze-out coordinates
 export PhqmdWithFreeze=1        ## = 0: PHQMD code without freeze-out coordinates, = 1: PHQMD code with freeze-out coordinates
 # For option PhqmdWithFreeze = 1:
-export WriteUnigen=0            ## = 1: UniGen-file (including freeze-out position) is written
+export WriteUnigen=1            ## = 1: UniGen-file (including freeze-out position) is written
 export WriteEventFreeze=1       ## = 1: EventFreeze-file (including freeze-out posiition and momentum) is written
 
 ## Delete & Merge
@@ -28,8 +28,8 @@ export last_hadd=$(printf "%0.0f" "$(echo " $lastJob / 100  " | bc -l)")
 export array_hadd=1-$last_hadd
 export last_hadd_simcbm=$(printf "%0.0f" "$(echo " $lastJob / 10  " | bc -l)")
 export array_hadd_simcbm=$firstJob-$last_hadd_simcbm
-export time="5-23:59:59"
-export partition="long"
+export time="7:59:59"
+export partition="main"
 export ram="8G"
 
 ###############################################################
