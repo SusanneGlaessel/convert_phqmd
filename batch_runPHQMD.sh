@@ -117,7 +117,7 @@ if [ "$RunStabilisation" == 1 ]; then
     cd $OUTDIR/$XXXXX
 
     if ! [ -e $phsdFile ]; then                         
-	    echo "Error: ${inputFile} is missing"
+	    echo "Error: ${phsdFile} is missing"
 	    exit 1
     fi
 
