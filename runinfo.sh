@@ -5,14 +5,7 @@
 
 ## Steps:
 export RunPhqmdCode=0           ## = 1: run PHQMD code - input: inputPHSD, output: phsd.dat (hadrons), fort.791 (cluster-baryons), fort.891 (anti-cluster-baryons)
-export RunStabilisation=0       ## = 1: run stabilisation routine - input: fort.791 & fort.781, output: fort.891 & fort.881
 export MakeDetectorInput=1      ## = 1: run conversion of PHQMD output into detector input - input: fort.891 & fort.881, output: unigen format
-
-## Options for steps:
-export ConvertAntiClusters=1    ## = 0: convert/stablise only clusters, = 1: convert clusters and anti-clusters
-export CountAllClusters=2       ## = 0: only physical clusters are counted (unphysical clusters are counted as single baronys), 
-                                ## = 1: all clusters A > 7 are counted as clusters
-				## = 2: both options 0 and 1 are executed one after the other
 
 ## Options for freeze-out coordinates
 export PhqmdWithFreeze=1        ## = 0: PHQMD code without freeze-out coordinates, = 1: PHQMD code with freeze-out coordinates
@@ -54,7 +47,6 @@ export IMPACTPARAMETER_MAX=15.0 ## maximum impact parameter in fm ! Max impact p
 
 export IGLUE=1                  ## =1 with partonic QGP phase (PHSD mode); =0 - HSD mode ! Needs to be set to = 0 for 3 GeV
 export EOS=0                    ## EoS; =0: hard EOS without M.D.I; =1 soft EoS; =2 soft EoS with mom. dependence 
-export ICLUSTER=1               ## enable or disable CLUSTER output
 
 ##############################################################
 #############  Directories and files #########################

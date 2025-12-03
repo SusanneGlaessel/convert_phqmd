@@ -5,12 +5,6 @@ XXXXX=$(printf "%05d" "$INDEX")
 echo "SLURM_ARRAY_TASK_ID = ${SLURM_ARRAY_TASK_ID}"
 echo "Output directory is: ${OUTDIR}"
 
-## Time settings for PHQMD & Stabilisation
-TSACA=10.0               ## TSACA: starting time for SACA 
-NTSACA=26                ## NTSACA, Number of SACA timesteps ( =>  tmax=tsaca+dtsaca*ntsaca must be < FINALT !)
-DTSACA=5.0               ## DTSACA, time step for SACA calculations (default=25.)
-FINALT=145.0             ## final time of calculation in fm/c
-
 ##################################################################################
 ################### Run PHQMD ####################################################
 ##################################################################################
@@ -55,7 +49,7 @@ if [ "$RunPhqmdCode" == 1 ]; then
  "$ISUBS",         ISUBS:  number of subsequent runs
  "$ISEED",    ISEED:  ANY uneven INTEGER number
  "$IGLUE",         IGLUE: =1 with partonic QGP phase (PHSD mode); =0 - HSD mode 
- "$FINALT",     FINALT: final time of calculation in fm/c (if set =0, it will be computed in the PHSD)
+ 145.0,     FINALT: final time of calculation in fm/c (if set =0, it will be computed in the PHSD)
  10,        ILOW: output level (default=10)
  0,         Idilept: =0 no dileptons; =1 electron pair; =2  muon pair
  0,         ICQ: =0 free rho's, =1 dropping mass, =2 broadening, =3 drop.+broad.
@@ -65,10 +59,10 @@ if [ "$RunPhqmdCode" == 1 ]; then
  0,         IUSER: =1 for general users : use default /optimized settings; = 0 for PHSD team
  1,         INUCLEI: =1 reactions with deuterons=1 including kinetic reactions with deuterons  
  1,         IPHQMD=1: propagation with QMD dynamics; =0 with HSD/PHSD dynamics !-->>> flags below for PHQMD ONLY:
- "$ICLUSTER",         ISACA: enable or disable SACA output (note: SACA or MST is controled by iflagsaca)
- "$TSACA",      TSACA: starting time for SACA
- "$DTSACA",       DTSACA, time step for SACA calculations
- "$NTSACA",        NTSACA, Number of SACA timesteps ( =>  tmax=tsaca+dtsaca*ntsaca must be < FINALT !)
+ 0,         ISACA: enable or disable SACA output (note: SACA or MST is controled by iflagsaca)
+ 0.0,       TSACA: starting time for SACA
+ 0.0,       DTSACA, time step for SACA calculations
+ 0,         NTSACA, Number of SACA timesteps ( =>  tmax=tsaca+dtsaca*ntsaca must be < FINALT !)
  0,         iflagsaca: =1 SACA(=FRIGA) analysis(+MST), =0 MST, no SACA --!!!! FRIGA
  0,         tageyuk=1  ! if Yukawa potential requested in SACA       
  0,         tageasy=1  ! if asymmetry energy requested in SACA 
@@ -108,56 +102,6 @@ if [ "$RunPhqmdCode" == 1 ]; then
 fi
 
 ##################################################################################
-################### Stabilisation routine for fort.791 & fort.781 ################
-##################################################################################
-
-if [ "$RunStabilisation" == 1 ]; then
-    
-    phsdFile="phsd.dat"
-    cd $OUTDIR/$XXXXX
-
-    if ! [ -e $phsdFile ]; then                         
-	    echo "Error: ${inputFile} is missing"
-	    exit 1
-    fi
-
-    echo "Run stabilisation routine for baryons from fort.791"
-
-    ## Create parameter file
-    echo ""$NUM",          number of parallel ensembles
-"$NTSACA",           number of timesteps
-"$TSACA",         initial time to start SACA output
-"$DTSACA",          size of timestep
-fort.791,     input filename
-fort.891,     output filename
-" > "parameters.txt"
-
-    cd $OUTDIR/$XXXXX
-    cp $SCRIPTDIR/$script_stab .
-    ./$script_stab
-    rm parameters.txt
-
-    if [ "$ConvertAntiClusters" == 1 ]; then
-	
-	echo "Run stabilisation routine for anti-baryons from fort.891"
-
-	## Create parameter file
-	echo ""$NUM",          number of parallel ensembles
-"$NTSACA",           number of timesteps
-"$TSACA",         initial time to start SACA output
-"$DTSACA",          size of timestep
-fort.781,     input filename
-fort.881,     output filename
-" > "parameters.txt"
-
-	cd $OUTDIR/$XXXXX
-	./$script_stab
-	rm $script_stab
-	rm parameters.txt
-    fi
-fi
-
-##################################################################################
 ######## Conversion of PHQMD output into detector input (unigen format) ##########
 ##################################################################################
 
@@ -174,48 +118,17 @@ if [ "$MakeDetectorInput" == 1 ]; then
 	 . $ROOT_SOURCE/thisroot.sh
     fi
 
-    inputFile="fort.891"
+    phsdFile="phsd.dat"
     cd $OUTDIR/$XXXXX
 
-    if ! [ -e $inputFile ]; then
-	echo "Error: ${inputFile} is missing"
-	exit 1
-    fi
-    
-    if [ "$ConvertAntiClusters" == 1 ]; then
-	
-	inputFile="fort.881"
-	cd $OUTDIR/$XXXXX
-
-	if ! [ -e $inputFile ]; then
+    if ! [ -e $phsdFile ]; then                         
 	    echo "Error: ${inputFile} is missing"
 	    exit 1
-	fi
-	
-	export IsConvertAntiClusters=kTRUE
-     
-     else
-        export IsConvertAntiClusters=kFALSE
-    fi
-
-    if [ "$CountAllClusters" == 1 ] || [ "$CountAllClusters" == 2 ] ; then
-	export IsCountAllClusters=kTRUE  
-        export FOLDER_CL=allclusters	
-    else                                                                   
-	export IsCountAllClusters=kFALSE
-	export FOLDER_CL=smallclusters
     fi
 
     if [ "$PhqmdWithFreeze" == 0 ]; then	
-	 cd $OUTUNIGEN/$FOLDER_CL
-	 root -l -b -q  "$script_convert(\"$OUTDIR\",\"$XXXXX\",$firstevent,$IsCountAllClusters,$IsConvertAntiClusters)"
-         
-	 if [ "$CountAllClusters" == 2 ] ; then
-              export IsCountAllClusters=kFALSE
-              export FOLDER_CL=smallclusters
-	      cd $OUTUNIGEN/$FOLDER_CL  
-              root -l -b -q  "$script_convert(\"$OUTDIR\",\"$XXXXX\",$firstevent,$IsCountAllClusters,$IsConvertAntiClusters)"
-	 fi	      
+	 cd $OUTUNIGEN
+	 root -l -b -q  "$script_convert(\"$OUTDIR\",\"$XXXXX\",$firstevent)"	      
     fi	
     
     if [ "$PhqmdWithFreeze" == 1 ]; then
@@ -231,15 +144,8 @@ if [ "$MakeDetectorInput" == 1 ]; then
 	    export IsWriteEventFreeze=kFALSE
 	fi
        
-       	cd $OUTUNIGEN/$FOLDER_CL
-	root -l -b -q  "$script_convert(\"$OUTDIR\",\"$XXXXX\",$firstevent,$IsCountAllClusters,$IsConvertAntiClusters,$IsWriteUnigen,$IsWriteEventFreeze)"
-        
-	if [ "$CountAllClusters" == 2 ] ; then
-             export IsCountAllClusters=kFALSE
-	     export FOLDER_CL=smallclusters
-	     cd $OUTUNIGEN/$FOLDER_CL
-	     root -l -b -q  "$script_convert(\"$OUTDIR\",\"$XXXXX\",$firstevent,$IsCountAllClusters,$IsConvertAntiClusters,$IsWriteUnigen,$IsWriteEventFreeze)"
-	fi
+       	cd $OUTUNIGEN
+	root -l -b -q  "$script_convert(\"$OUTDIR\",\"$XXXXX\",$firstevent,$IsWriteUnigen,$IsWriteEventFreeze)"
     fi	
 fi
 
