@@ -96,8 +96,8 @@ if [ "$RunPhqmdCode" == 1 ]; then
     rm $OUTDIR/$XXXXX/phqmd
     rm $OUTDIR/$XXXXX/iso.data
     rm $OUTDIR/$XXXXX/mass.inp
-    rm $PHQMDDIR/transitionProb .
-    rm $PHQMDDIR/kbarn_selfenergy .
+    rm -r $OUTDIR/$XXXXX/transitionProb
+    rm -r $OUTDIR/$XXXXX/kbarn_selfenergy
 
     ## Remove not needed outputfiles
     rm -r $OUTDIR/$XXXXX/OUTPUT
