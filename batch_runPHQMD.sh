@@ -41,6 +41,8 @@ if [ "$RunPhqmdCode" == 1 ]; then
     ln -s $PHQMDDIR/phqmd .
     ln -s $PHQMDDIR/iso.data .
     ln -s $PHQMDDIR/mass.inp .
+    ln -s $PHQMDDIR/transitionProb .
+    ln -s $PHQMDDIR/kbarn_selfenergy .
 
     ## Create inputPHSD
     echo " "$MASSTA",       MASSTA: target mass / au=197 / pb=208
@@ -94,6 +96,8 @@ if [ "$RunPhqmdCode" == 1 ]; then
     rm $OUTDIR/$XXXXX/phqmd
     rm $OUTDIR/$XXXXX/iso.data
     rm $OUTDIR/$XXXXX/mass.inp
+    rm $PHQMDDIR/transitionProb .
+    rm $PHQMDDIR/kbarn_selfenergy .
 
     ## Remove not needed outputfiles
     rm -r $OUTDIR/$XXXXX/OUTPUT
