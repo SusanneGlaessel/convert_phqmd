@@ -154,7 +154,7 @@ c********************************
 301   continue ! end num
 300   continue ! end time steps
 
-569      format(1x,2I4,7(1XE11.4),2(1XI3),3(1XI10),2(1XI10),2(1XE11.4)) ! E.B.-2020: format extended for d
+569      format(1x,2I4,7(1XE16.9),2(1XI3),3(1XI10),2(1XI10),2(1XE11.4)) ! E.B.-2020: format extended for d
 
 c************************************
 
