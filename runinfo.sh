@@ -4,8 +4,8 @@
 ## Options for running PHQMD code, stabilisation & conversion #
 
 ## Steps:
-export RunPhqmdCode=0           ## = 1: run PHQMD code - input: inputPHSD, output: phsd.dat (hadrons), fort.791 (cluster-baryons), fort.891 (anti-cluster-baryons)
-export RunStabilisation=0       ## = 1: run stabilisation routine - input: fort.791 & fort.781, output: fort.891 & fort.881
+export RunPhqmdCode=1           ## = 1: run PHQMD code - input: inputPHSD, output: phsd.dat (hadrons), fort.791 (cluster-baryons), fort.891 (anti-cluster-baryons)
+export RunStabilisation=1       ## = 1: run stabilisation routine - input: fort.791 & fort.781, output: fort.891 & fort.881
 export MakeDetectorInput=1      ## = 1: run conversion of PHQMD output into detector input - input: fort.891 & fort.881, output: unigen format
 
 ## Options for steps:
@@ -17,7 +17,7 @@ export CountAllClusters=2       ## = 0: only physical clusters are counted (unph
 ## Options for freeze-out coordinates
 export PhqmdWithFreeze=1        ## = 0: PHQMD code without freeze-out coordinates, = 1: PHQMD code with freeze-out coordinates
 # For option PhqmdWithFreeze = 1:
-export WriteUnigen=0            ## = 1: UniGen-file (including freeze-out position) is written
+export WriteUnigen=1            ## = 1: UniGen-file (including freeze-out position) is written
 export WriteEventFreeze=1       ## = 1: EventFreeze-file (including freeze-out posiition and momentum) is written
 
 ## Delete & Merge
@@ -63,7 +63,7 @@ export version_phqmd=PHSD-PHQMD
 export LOCATION=/lustre
 export DIR=$LOCATION/cbm/users/$USER
 export PHQMDDIR=$DIR/$version_phqmd
-export ROOT_SOURCE=/cvmfs/fairsoft.gsi.de/debian11/fairsoft/nov22p1/bin
+export ROOT_SOURCE=/cvmfs/fairsoft.gsi.de/debian13/fairsoft/cpp17/jan24p6/bin
 export UNIGEN_SOURCE=$DIR/unigen
 #export CBMROOT_DIR=$DIR/cbmroot/build
 export USE_CBMROOT=0           ## =1: if cbmroot should be sourced instead of root and UniGen

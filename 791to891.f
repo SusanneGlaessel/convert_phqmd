@@ -23,6 +23,8 @@ C     column 17:   infor from PHQMD: P(4,J) - production time of nucleon in fm/c
 C     column 18:   binding energy of cluster per baryon [GeV]
 C     used format: format(1x,2I4,7(1XE11.4),2(1XI3),3(1XI10),2(1XI10),(2XE11.4))
 
+c     changed in order to remove some bugs 4.12.25  
+
       character*130 filename91,filename93,filename95,filename97
 
       parameter (imax1=1000)    !number of particles
@@ -120,7 +122,7 @@ cccccccccccccccccccccccccccccccccccccccc
 
          do 300 Itst=1,itstep
          do 301 inum=1,num
-             read(791,9333,end=999) IRUN(itst,inum),ISUB(itst,inum),b,
+            read(791,9333,end=999) IRUN(itst,inum),ISUB(itst,inum),b,
      &   time(itst),
      &   it(itst,inum),npr,nzpr,nta,nzta,frepp,iqmdeos
 
@@ -154,7 +156,7 @@ c********************************
 301   continue ! end num
 300   continue ! end time steps
 
-569      format(1x,2I4,7(1XE16.9),2(1XI3),3(1XI10),2(1XI10),2(1XE11.4)) ! E.B.-2020: format extended for d
+ 569  format(1x,2I4,7(1XE16.9),2(1XI3),3(1XI10),2(1XI10),2(1XE11.4))  ! for PHSD-PHQMD: format extended for coordinates
 
 c************************************
 
@@ -198,7 +200,9 @@ c************************************
             enddo
 
       do 114 itin=2,itstep ! time steps into the future
-        tref=tstart+dtstep*(itin-1) ! change first timestep
+c     tref=tstart+dtstep*(itin-1) ! change first timestep
+c     tref=tstart+dtstep*(itin-2) ! change first timestep corrected
+         tref=time(itin-1)        ! change first timestep exact time (referst to same timestep as "corrected")
                   do 113 ktst1=1,nparticlest(itin,inum)!loop over baryons at that time
                   irr=0
       idn=IPHSD4FRIGA(ktst1,itin,inum)!to shorten lines
@@ -211,7 +215,7 @@ c************************************
 c************************************
       if(ipos(idn,itstep).eq.0)goto 123! leave if this PHSD ID does not exist in the last time step
 c     if(pfriga(ipos(idn,itstep),itstep,inum).gt.10+itin*5)goto 123! not yet freezed out
-      if(pfriga(ipos(idn,itstep),itstep,inum).gt.tref)goto 123 ! not yet freezed out
+      if(frou(idn).gt.tref)goto 123 ! not yet freezed out
 c************************************
 
       kln=kclus1SMt(ktst1,itin,inum)! cluster to which baryon belongs at time step itin
@@ -272,7 +276,9 @@ c     reparation of the file 791
          if(frou(IPHSD4FRIGA(ktst5,itin-1,inum)).gt.tref)goto 214 ! all baryons for the disintegrating cluster have to have an earlier freeze out time
 c         if(frou(IPHSD4FRIGA(ktst5,itin-1,inum)).eq.0.)goto 214
          if(ebind(ktst5,itin-1,inum).gt.emax)goto 214
-
+         if(ipos(IPHSD4FRIGA(ktst5,itin-1,inum),itstep).eq.0)goto 214 ! leave if this PHSD ID does not exist in the last time step
+         if(ipos(IPHSD4FRIGA(ktst5,itin-1,inum),itin).eq.0)goto 214 ! leave if this PHSD ID does not exist in the current time step
+         
          iclu=iclu+1
          idb(jk)=IPHSD4FRIGA(ktst5,itin-1,inum)
          ipo(jk)=ktst5

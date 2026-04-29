@@ -38,11 +38,8 @@ if [ "$RunPhqmdCode" == 1 ]; then
     ## Copy PHQMD-code into outputfolder
     ln -s $PHQMDDIR/HSDINPUT .
     ln -s $PHQMDDIR/CC_INPUT .
-    ln -s $PHQMDDIR/phqmd .
-    ln -s $PHQMDDIR/iso.data .
-    ln -s $PHQMDDIR/mass.inp .
-    ln -s $PHQMDDIR/transitionProb .
-    ln -s $PHQMDDIR/kbarn_selfenergy .
+    ln -s $PHQMDDIR/INPUT_DATA .
+    ln -s $PHQMDDIR/phsd .
 
     ## Create inputPHSD
     echo " "$MASSTA",       MASSTA: target mass / au=197 / pb=208
@@ -86,18 +83,15 @@ if [ "$RunPhqmdCode" == 1 ]; then
  0,       IANTIPROT: =-1 for antiproton beam (projectile), =0 for all other projectiles (default=0)
  " > "inputPHSD"
 
-    time ./phqmd
+    time ./phsd
 
     mv $OUTDIR/$XXXXX/inputPHSD $OUTDIR/
 
     ## Remove PHQMD-Code
     rm -r $OUTDIR/$XXXXX/HSDINPUT
     rm -r $OUTDIR/$XXXXX/CC_INPUT
-    rm $OUTDIR/$XXXXX/phqmd
-    rm $OUTDIR/$XXXXX/iso.data
-    rm $OUTDIR/$XXXXX/mass.inp
-    rm -r $OUTDIR/$XXXXX/transitionProb
-    rm -r $OUTDIR/$XXXXX/kbarn_selfenergy
+    rm -r $OUTDIR/$XXXXX/INPUT_DATA
+    rm $OUTDIR/$XXXXX/phsd
 
     ## Remove not needed outputfiles
     rm -r $OUTDIR/$XXXXX/OUTPUT
@@ -106,7 +100,8 @@ if [ "$RunPhqmdCode" == 1 ]; then
     rm $OUTDIR/$XXXXX/fort.80
     rm $OUTDIR/$XXXXX/fort.790
     rm $OUTDIR/$XXXXX/fort.780
-    
+    rm $OUTDIR/$XXXXX/fort.300
+
     cd $SCRIPTDIR
 
 fi
