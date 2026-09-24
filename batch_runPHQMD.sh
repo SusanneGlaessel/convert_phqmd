@@ -55,7 +55,7 @@ if [ "$RunPhqmdCode" == 1 ]; then
  "$ISEED",    ISEED:  ANY uneven INTEGER number
  "$IGLUE",         IGLUE: =1 with partonic QGP phase (PHSD mode); =0 - HSD mode 
  "$FINALT",     FINALT: final time of calculation in fm/c (if set =0, it will be computed in the PHSD)
- 10,        ILOW: output level (default=10)
+ 12,        ILOW: output level (default=12)
  0,         Idilept: =0 no dileptons; =1 electron pair; =2  muon pair
  0,         ICQ: =0 free rho's, =1 dropping mass, =2 broadening, =3 drop.+broad.
  0,         IHARD: =1 with charm and bottom; =0 - without 
