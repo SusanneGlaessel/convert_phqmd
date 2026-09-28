@@ -156,8 +156,8 @@ c********************************
 301   continue ! end num
 300   continue ! end time steps
 
- 569  format(1x,2I4,7(1XE16.9),2(1XI3),3(1XI10),2(1XI10),2(1XE11.4))  ! for PHSD-PHQMD: format extended for coordinates
-
+c 569  format(1x,2I4,7(1XE16.9),2(1XI3),3(1XI10),2(1XI10),2(1XE11.4))  ! for PHSD-PHQMD: format extended for coordinates
+  569  format(1x,2I4,7(1XE11.4),2(1XI3),3(1XI10),2(1XI10),2(1XE11.4))  ! for PHSD-PHQMD: format shortened for coordinates
 c************************************
 
 c     end of reading 791/793

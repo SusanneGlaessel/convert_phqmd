@@ -10,7 +10,7 @@ export MakeDetectorInput=1      ## = 1: run conversion of PHQMD output into dete
 
 ## Options for steps:
 export ConvertAntiClusters=1    ## = 0: convert/stablise only clusters, = 1: convert clusters and anti-clusters
-export CountAllClusters=2       ## = 0: only physical clusters are counted (unphysical clusters are counted as single baronys), 
+export CountAllClusters=1       ## = 0: only physical clusters are counted (unphysical clusters are counted as single baronys), 
                                 ## = 1: all clusters A > 7 are counted as clusters
 				## = 2: both options 0 and 1 are executed one after the other
 
@@ -52,7 +52,7 @@ export nEvents=$(echo " $NUM * $ISUBS " | bc -l)
 export IMPACTPARAMETER_MIN=0.0  ## minimal impact parameter in fm
 export IMPACTPARAMETER_MAX=15.0 ## maximum impact parameter in fm ! Max impact parameter must not be > 15.0 fm !
 
-export IGLUE=1                  ## =1 with partonic QGP phase (PHSD mode); =0 - HSD mode ! Needs to be set to = 0 for 3 GeV
+export IGLUE=1                  ## =1 with partonic QGP phase (PHSD mode); =0 - HSD mode ! Needs to be set to =0 for 3 GeV/3.5 GeV and =1 for higher energies
 export EOS=0                    ## EoS; =0: hard EOS without M.D.I; =1 soft EoS; =2 soft EoS with mom. dependence 
 export ICLUSTER=1               ## enable or disable CLUSTER output
 
