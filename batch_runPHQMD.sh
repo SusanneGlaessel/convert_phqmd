@@ -61,7 +61,7 @@ if [ "$RunPhqmdCode" == 1 ]; then
  0,         IHARD: =1 with charm and bottom; =0 - without 
  1,         iDQPM: =1 with DQPM(T,muB) for QGP, =0 as in PHSD4.X - old DQPM(T) (default=1)
  1,         IBweight_MC: =0 constant step in B =DBIMP; =1 choose B by Monte-Carlo ISUBS times in [Bmin,Bmax]
- 1,         INUCLEI: =1 reactions with deuterons=1 including kinetic reactions with deuterons  
+ 1,         INUCLEI: =1 including kinetic reactions with deuterons  
  1,         IPHQMD=1: propagation with QMD dynamics; =0 with HSD/PHSD dynamics !-->>> flags below for PHQMD ONLY:
  "$EOS",         iqmdeos  ! EoS for QMD option IPHQMD=1 ; =0: hard EOS without M.D.I; =1 soft EoS; =2 soft EoS with mom. dependence
  "$ICLUSTER",         ISACA: enable or disable SACA output (note: SACA or MST is controled by iflagsaca)
