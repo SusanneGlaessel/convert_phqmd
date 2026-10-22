@@ -82,13 +82,10 @@ if [ "$RunPhqmdCode" == 1 ]; then
     rm $OUTDIR/$XXXXX/phsd
 
     ## Remove not needed outputfiles
-    rm -r $OUTDIR/$XXXXX/OUTPUT
-    rm $OUTDIR/$XXXXX/testDQPM.txt
     rm $OUTDIR/$XXXXX/fort.888
     rm $OUTDIR/$XXXXX/fort.80
     rm $OUTDIR/$XXXXX/fort.790
     rm $OUTDIR/$XXXXX/fort.780
-    rm $OUTDIR/$XXXXX/fort.300
 
     cd $SCRIPTDIR
 
@@ -120,7 +117,7 @@ fort.891,     output filename
 " > "parameters.txt"
 
     cd $OUTDIR/$XXXXX
-    cp $SCRIPTDIR/$script_stab .
+    cp $OUTDIR/$script_stab .
     ./$script_stab
     rm parameters.txt
 

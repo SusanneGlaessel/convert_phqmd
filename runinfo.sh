@@ -18,25 +18,26 @@ export CountAllClusters=1       ## = 0: only physical clusters are counted (unph
 export PhqmdWithFreeze=1        ## = 0: PHQMD code without freeze-out coordinates, = 1: PHQMD code with freeze-out coordinates
 # For option PhqmdWithFreeze = 1:
 export WriteUnigen=1            ## = 1: UniGen-file (including freeze-out position) is written
-export WriteEventFreeze=1       ## = 1: EventFreeze-file (including freeze-out posiition and momentum) is written
+export WriteEventFreeze=0       ## = 1: EventFreeze-file (including freeze-out posiition and momentum) is written
 
 ## Delete & Merge
 export DeleteFiles=0            ## = 1: deletes all output files, but the detector-input [dataset].phqmd.root
 export RunHadd=0                ## = 1: add 100 jobs into one file
-export RunHaddSim=0             ## = 1: add 10 jobs in one file for detector simulations
 
 ###############################################################
 ## Parameters for sbatch ######################################
 
 export firstJob=1
-export lastJob=1000
+export lastJob=100
 export array=$firstJob-$lastJob
 export last_hadd=$(printf "%0.0f" "$(echo " $lastJob / 100  " | bc -l)")
 export array_hadd=1-$last_hadd
 export last_hadd_simcbm=$(printf "%0.0f" "$(echo " $lastJob / 10  " | bc -l)")
 export array_hadd_simcbm=$firstJob-$last_hadd_simcbm
 export time="5-23:59:59"
+#export time="7:59:59"
 export partition="long"
+#export partition="main"
 export ram="8G"
 
 ###############################################################
@@ -50,7 +51,7 @@ export ISUBS=10                 ## number of subsequent runs
 export nEvents=$(echo " $NUM * $ISUBS " | bc -l)
 
 export IMPACTPARAMETER_MIN=0.0  ## minimal impact parameter in fm
-export IMPACTPARAMETER_MAX=15.0 ## maximum impact parameter in fm ! Max impact parameter must not be > 15.0 fm !
+export IMPACTPARAMETER_MAX=15.0 ## maximum impact parameter in fm 
 
 export IGLUE=1                  ## =1 with partonic QGP phase (PHSD mode); =0 - HSD mode ! Needs to be set to =0 for 3 GeV/3.5 GeV and =1 for higher energies
 export EOS=0                    ## EoS; =0: hard EOS without M.D.I; =1 soft EoS; =2 soft EoS with mom. dependence 
