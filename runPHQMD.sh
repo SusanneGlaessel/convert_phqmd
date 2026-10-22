@@ -60,21 +60,7 @@ if [ "$RunHadd" == 1 ]; then
 	mkdir -p $LOGDIR
 	export file=phsd.root
 	export array=$array_hadd
-	export batchfile=$SCRIPTDIR/batch_hadd_file.sh
+	export batchfile=batch_hadd_file.sh
 fi
 
-if [ "$RunHaddSim" == 1 ]; then
-	jobname=haddsim
-	echo "Run hadd for simcbm"
-      	export INDIR=$OUTUNIGEN
-	export OUTDIR=$INDIR/haddsimcbm
-	echo "Output will be written to: ${OUTDIR}"
-	mkdir -p $OUTDIR
-	export LOGDIR=$OUTDIR"/log"
-	mkdir -p $LOGDIR                                                                                                                            
-	export file=phsd.root                                                                                                                                                                                                  
-	export array=$array_hadd_simcbm                                                                                                                   
-	export batchfile=$SCRIPTDIR/batch_hadd_file.sh                                                                                                                     
-fi 
-
-sbatch --job-name=${jobname} --partition=${partition} --time=${time} --array=${array} -D $LOGDIR -o %a_%A.out.log -e %a_%A.err.log --export=ALL -- $batchfile
+sbatch --job-name=${jobname} --partition=${partition} --time=${time} --array=${array} -D $LOGDIR -o %a_%A.out.log -e %a_%A.err.log --export=ALL -- $SCRIPTDIR/$batchfile
