@@ -8,8 +8,8 @@
 
 optional:
 4) delete all files, keep only the detector input
-5) merge output files - 100 or 10 outputfiles (for detector simulations) into 1 file
-All 4 steps are performed with the batch-script. Single steps can be
+5) merge output files - 100 into 1 file
+All steps are performed with the batch-script. Single steps can be
 switched on or off.
 
 ## Requirements (besides the PHQMD code)

@@ -53,7 +53,7 @@ export nEvents=$(echo " $NUM * $ISUBS " | bc -l)
 export IMPACTPARAMETER_MIN=0.0  ## minimal impact parameter in fm
 export IMPACTPARAMETER_MAX=15.0 ## maximum impact parameter in fm 
 
-export IGLUE=1                  ## =1 with partonic QGP phase (PHSD mode); =0 - HSD mode ! Needs to be set to =0 for 3 GeV/3.5 GeV and =1 for higher energies
+export IGLUE=1                  ## =1 with partonic QGP phase (PHSD mode); =0 - HSD mode ! Needs to be set to = 0 for sqrt(s) < 3.5 GeV
 export EOS=0                    ## EoS; =0: hard EOS without M.D.I; =1 soft EoS; =2 soft EoS with mom. dependence 
 export ICLUSTER=1               ## enable or disable CLUSTER output
 
